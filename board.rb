@@ -1,4 +1,5 @@
-# require_relative 'ship'
+require_relative 'ship'
+require_relative 'cell'
 
 class Board
 
@@ -18,7 +19,8 @@ class Board
     @row_no.times do |r|
       @column_no.times do |c|
         coordinate = (r+1).to_s + "," + (c+1).to_s
-        @status[coordinate] = "."
+        cell = Cell.new(r, c)
+        @status[coordinate] = cell
       end
     end
   end
@@ -30,8 +32,23 @@ class Board
 
   def create_ship(size, board)
     ship = Ship.new(size, board)
-    ship.set_coordinates
+    coordinates = ship.set_coordinates
+    place_ship(ship, coordinates)
   end
+
+  def place_ship(ship, coordinates)
+    coordinates.each do |x|
+      coordinate = x[0].to_s + "," + x[1].to_s
+      @status[coordinate].assign_ship(ship)
+    end
+  end
+
+  def reveal(row, column)
+    coordinate = row.to_s + "," + column.to_s
+    @status[coordinate].guess
+    display_board
+  end
+
 
   def display_board
     top_row = "   "
@@ -50,7 +67,7 @@ class Board
 
       @column_no.times do |c|
         coordinate = (r+1).to_s + "," + (c+1).to_s
-        cell_status = @status[coordinate]
+        cell_status = @status[coordinate].display
         this_row += cell_status + " "
       end
 
