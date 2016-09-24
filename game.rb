@@ -10,6 +10,10 @@ class Game
     @com = Communication.new
 
     game_set_up
+
+    while !is_game_over?
+      get_answer_and_update_board
+    end
   end
 
 
@@ -17,6 +21,22 @@ class Game
     @board = Board.new([10,10])
     place_ships
   end
+
+  def get_answer_and_update_board
+    guess = @com.get_coordinates(@board)
+    @board.reveal(guess[0], guess[1])
+    @com.describe_guess_impact(@board.last_guess)
+  end
+
+  def is_game_over?
+    @board.ships.values.each do |ship|
+      return false if !ship.sunk
+    end
+    @com.indicate_win
+    return true
+  end
+
+private
 
   def place_ships
     @board.create_ships
